@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Speedbuild — тренировка быстрой стройки</title>
+  <meta name="description" content="Выбери тему, размер и время — получи доску референсов из Minecraft и реального мира и строй на скорость.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Crect width='3' height='1' fill='%2380e02a'/%3E%3Crect y='1' width='3' height='2' fill='%23866043'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap&subset=cyrillic" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="bar" id="bar">
+    <div class="bar-in">
+      <a class="mark" href="#/" aria-label="Speedbuild, новый раунд">
+        <svg viewBox="0 0 3 3" aria-hidden="true" shape-rendering="crispEdges"><rect width="3" height="1" fill="#80e02a"/><rect y="1" width="3" height="2" fill="#866043"/><rect x="1" y="1" width="1" height="1" fill="#6b4c33"/></svg>
+        Speedbuild
+      </a>
+      <nav class="nav" aria-label="Разделы">
+        <a href="#/" data-route="setup">Раунд</a>
+        <a href="#/history" data-route="history">История</a>
+        <a href="#/sources" data-route="sources">Источники</a>
+      </nav>
+      <div class="bar-end"><span class="kbd-hint" id="kbdHint"></span></div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ================= setup ================= -->
+    <section class="view" id="view-setup" aria-labelledby="setupTitle">
+      <div class="title-row">
+        <div>
+          <h1 id="setupTitle">Новый раунд</h1>
+          <p class="subline num" id="summary">Средняя постройка · 20 минут · 6 референсов из Minecraft</p>
+        </div>
+        <div class="actions">
+          <button class="btn" id="randomRound" type="button">Случайный раунд</button>
+          <button class="btn primary" id="start" type="button">Начать</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="panel span-7" aria-labelledby="themeHead">
+          <div class="panel-head">
+            <h2 id="themeHead">Тема</h2>
+            <div class="segmented" role="group" aria-label="Как выбрать тему" id="themeMode">
+              <button type="button" data-v="random" aria-pressed="true">Случайная</button>
+              <button type="button" data-v="list" aria-pressed="false">Из списка</button>
+              <button type="button" data-v="custom" aria-pressed="false">Своя</button>
+            </div>
+          </div>
+
+          <div id="mode-random" class="theme-now">
+            <p class="theme-title" id="themeTitle" aria-live="polite">Готическая часовня</p>
+            <div class="facts" id="themeFacts"></div>
+            <div class="theme-tools">
+              <button class="btn" type="button" id="reroll">Другая тема</button>
+              <span class="help num" id="themeSeed"></span>
+            </div>
+            <div class="alts">
+              <span class="label">Или одна из этих</span>
+              <div class="theme-list" id="themeAlts" role="group" aria-label="Другие варианты"></div>
+            </div>
+          </div>
+
+          <div id="mode-list" hidden>
+            <div class="theme-list" id="themeList" role="group" aria-label="Темы"></div>
+            <button class="btn theme-more" type="button" id="moreThemes">Показать ещё 8</button>
+          </div>
+
+          <div id="mode-custom" hidden>
+            <div class="field">
+              <label class="label" for="customText">Что строим?</label>
+              <input class="input" id="customText" maxlength="80" placeholder="Например: японская пекарня у реки" autocomplete="off">
+              <p class="help">Слова из словаря тем (стиль, объект, место) переводятся для поиска сами. Английский запрос, например «nordic longhouse», ищется как есть.</p>
+            </div>
+          </div>
+
+          <div class="families" id="familyBox">
+            <span class="label">Стиль</span>
+            <div class="chips" id="families" role="group" aria-label="Семейство стилей"></div>
+          </div>
+        </section>
+
+        <section class="panel span-5" aria-labelledby="paramsHead">
+          <div class="panel-head"><h2 id="paramsHead">Параметры</h2></div>
+
+          <div class="field">
+            <span class="label">Размер постройки</span>
+            <div class="options" id="sizes" role="group" aria-label="Размер постройки"></div>
+          </div>
+
+          <div class="field">
+            <span class="label">Время</span>
+            <div class="times num" id="times" role="group" aria-label="Время на постройку"></div>
+          </div>
+
+          <div class="field">
+            <span class="label" id="countLabel">Референсов</span>
+            <div class="stepper" role="group" aria-labelledby="countLabel">
+              <button type="button" id="countDown" aria-label="Меньше">−</button>
+              <output id="count" class="num">6</output>
+              <button type="button" id="countUp" aria-label="Больше">+</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label">Откуда референсы</span>
+            <div class="segmented" role="group" aria-label="Источник референсов" id="sourceMode">
+              <button type="button" data-v="mc" aria-pressed="true">Minecraft</button>
+              <button type="button" data-v="irl" aria-pressed="false">Реальный мир</button>
+              <button type="button" data-v="mix" aria-pressed="false">Оба</button>
+            </div>
+            <p class="help" id="sourceHelp"></p>
+          </div>
+        </section>
+
+        <section class="panel span-12" aria-labelledby="recentHead">
+          <div class="panel-head">
+            <h2 id="recentHead">Последние раунды</h2>
+            <a class="text-btn" href="#/history" id="recentAll">Вся история</a>
+          </div>
+          <div class="rows" id="recent"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ================= session ================= -->
+    <section class="view" id="view-session" hidden aria-labelledby="sessionTitle">
+      <div class="panel">
+        <div class="session-head">
+          <div>
+            <h1 id="sessionTitle">Тема</h1>
+            <p class="meta num" id="sessionMeta"></p>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button" id="pause">Пауза</button>
+            <button class="btn" type="button" id="newRefs">Новые референсы</button>
+            <button class="btn primary" type="button" id="finish">Готово</button>
+          </div>
+        </div>
+        <div class="clock" id="clock">
+          <div>
+            <div class="clock-figure num" id="clockFigure" aria-live="off">20:00</div>
+            <div class="clock-sub num" id="clockSub">осталось из <b>20:00</b></div>
+          </div>
+          <div class="xp" id="xp" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="board-head">
+        <h2>Референсы</h2>
+        <span class="board-status num" id="boardStatus"></span>
+      </div>
+      <div id="boardWrap">
+        <div class="board" id="board"></div>
+      </div>
+      <div class="board-foot">
+        <span id="boardQuery"></span>
+        <span><button class="text-btn" type="button" id="copyLink">Скопировать ссылку на раунд</button>&ensp;·&ensp;<a id="pinterest" href="#" target="_blank" rel="noopener">Ещё похожие на Pinterest</a></span>
+      </div>
+    </section>
+
+    <!-- ================= history ================= -->
+    <section class="view" id="view-history" hidden aria-labelledby="historyTitle">
+      <div class="title-row">
+        <div>
+          <h1 id="historyTitle">История</h1>
+          <p class="subline num" id="historySum"></p>
+        </div>
+        <div class="actions"><a class="btn primary" href="#/">Новый раунд</a></div>
+      </div>
+      <section class="panel" aria-label="Все раунды">
+        <div class="rows" id="historyRows"></div>
+      </section>
+      <p style="margin-top:18px"><button class="text-btn danger" type="button" id="clearHistory">Очистить историю</button></p>
+    </section>
+
+    <!-- ================= sources ================= -->
+    <section class="view" id="view-sources" hidden aria-labelledby="sourcesTitle">
+      <div class="title-row">
+        <div>
+          <h1 id="sourcesTitle">Источники</h1>
+          <p class="subline">Откуда приходят референсы и как сделать их красивее.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="settings-row">
+          <div>
+            <h2>Без ключей</h2>
+            <p class="desc">Работают сразу. Запрос идёт от точного («gothic chapel fog») к общему («chapel»), поэтому референсы на доске похожи друг на друга.</p>
+          </div>
+          <div class="src-list" id="srcFree"></div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <h2>Красивее, с ключом</h2>
+            <p class="desc">Unsplash и Pexels — самые «пинтерестные» фото реальных зданий. Ключи бесплатные, хранятся только в этом браузере и отправляются только в сам сервис.</p>
+          </div>
+          <div class="src-list">
+            <div class="src">
+              <b>Unsplash</b><span class="state idle" id="st-Unsplash">не подключён</span>
+              <p>Зарегистрируй приложение на unsplash.com/developers и вставь Access Key.</p>
+              <div class="key-row" style="grid-column:1/-1">
+                <label class="sr-only" for="keyUnsplash">Unsplash Access Key</label>
+                <input class="input" id="keyUnsplash" placeholder="Access Key" autocomplete="off" spellcheck="false">
+              </div>
+            </div>
+            <div class="src">
+              <b>Pexels</b><span class="state idle" id="st-Pexels">не подключён</span>
+              <p>Получи ключ на pexels.com/api — это занимает минуту.</p>
+              <div class="key-row" style="grid-column:1/-1">
+                <label class="sr-only" for="keyPexels">Pexels API Key</label>
+                <input class="input" id="keyPexels" placeholder="API Key" autocomplete="off" spellcheck="false">
+              </div>
+            </div>
+            <div style="padding-top:14px"><button class="btn primary" type="button" id="saveKeys">Сохранить</button><span class="saved" id="savedStamp"></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="lightbox" id="lightbox" aria-label="Референс">
+    <div class="lightbox-in">
+      <div class="lightbox-stage">
+        <img id="lbImg" alt="">
+        <button class="nav-btn prev" type="button" id="lbPrev" aria-label="Предыдущий"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg></button>
+        <button class="nav-btn next" type="button" id="lbNext" aria-label="Следующий"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m6 3 5 5-5 5"/></svg></button>
+      </div>
+      <div class="lightbox-foot">
+        <p class="cap" id="lbCap"></p>
+        <div class="actions">
+          <a class="btn small" id="lbSource" target="_blank" rel="noopener">Источник</a>
+          <button class="btn small" type="button" id="lbClose">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="done" id="done" aria-labelledby="doneTitle">
+    <div class="done-in">
+      <h2 id="doneTitle">Время вышло</h2>
+      <p class="muted" id="doneTheme"></p>
+      <p class="result num" id="doneResult"></p>
+      <div class="actions">
+        <button class="btn primary" type="button" id="nextRound">Следующая тема</button>
+        <button class="btn" type="button" id="againRound">Ещё раз эту</button>
+        <button class="btn" type="button" id="toSetup">К настройкам</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p style="max-width:640px;margin:40px auto;padding:0 24px">Speedbuild работает в браузере: включи JavaScript, чтобы получить тему и референсы.</p></noscript>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
