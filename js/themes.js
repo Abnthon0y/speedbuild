@@ -299,3 +299,112 @@ export function customTheme(text, size) {
       : { style: style ? style.en : '', object: obj ? obj.en : 'building', mod: mod ? mod.en : null, raw: style || obj ? null : text.trim() },
   };
 }
+
+// Слова, по которым картинка считается «про этот объект»: ищутся в подписи, тегах и категориях.
+// Объекты, которых здесь нет, узнаются по последнему слову английского названия.
+const OBJECT_WORDS = {
+  'street lamp': ['street lamp', 'lamppost', 'lamp post', 'streetlight', 'street light', 'lantern'],
+  'market stall': ['market stall', 'stall', 'booth', 'stand'],
+  gazebo: ['gazebo', 'pavilion', 'pergola'],
+  kiosk: ['kiosk', 'booth', 'newsstand'],
+  cart: ['cart', 'wagon', 'carriage'],
+  boat: ['boat', 'rowboat', 'canoe', 'sampan', 'dinghy'],
+  statue: ['statue', 'sculpture', 'monument'],
+  gate: ['gate', 'gateway', 'torii', 'portal'],
+  'small cottage': ['cottage', 'hut', 'cabin', 'starter house', 'small house'],
+  shrine: ['shrine', 'altar', 'sanctuary'],
+  archway: ['arch', 'archway'],
+  footbridge: ['footbridge', 'bridge'],
+  greenhouse: ['greenhouse', 'glasshouse', 'conservatory'],
+  tent: ['tent', 'yurt', 'camp'],
+  tree: ['tree', 'oak', 'sakura', 'willow'],
+  'blacksmith forge': ['blacksmith', 'forge', 'smithy'],
+  pier: ['pier', 'dock', 'jetty', 'wharf'],
+  'bus stop': ['bus stop', 'tram stop', 'shelter'],
+  'guard hut': ['guard', 'outpost', 'sentry', 'hut'],
+  beehive: ['beehive', 'apiary', 'bee'],
+  'stone bridge': ['bridge'],
+  house: ['house', 'home', 'cottage', 'villa'],
+  tavern: ['tavern', 'inn', 'pub'],
+  chapel: ['chapel', 'church'],
+  bakery: ['bakery', 'bakehouse'],
+  tower: ['tower'],
+  lighthouse: ['lighthouse'],
+  bridge: ['bridge'],
+  windmill: ['windmill', 'mill'],
+  stable: ['stable', 'stables', 'barn'],
+  library: ['library'],
+  mansion: ['mansion', 'manor', 'estate'],
+  'tea house': ['tea house', 'teahouse', 'tea room'],
+  shop: ['shop', 'store', 'storefront'],
+  cafe: ['cafe', 'café', 'coffee'],
+  temple: ['temple', 'pagoda', 'shrine'],
+  ship: ['ship', 'galleon', 'sailboat', 'vessel'],
+  airship: ['airship', 'zeppelin', 'blimp'],
+  watchtower: ['watchtower', 'watch tower', 'tower'],
+  farmhouse: ['farmhouse', 'farm', 'barn'],
+  observatory: ['observatory', 'telescope'],
+  inn: ['inn', 'tavern', 'hotel'],
+  villa: ['villa'],
+  bathhouse: ['bathhouse', 'bath house', 'onsen', 'baths', 'hammam'],
+  watermill: ['watermill', 'water mill', 'water wheel', 'waterwheel'],
+  school: ['school', 'schoolhouse'],
+  castle: ['castle', 'citadel', 'keep'],
+  cathedral: ['cathedral', 'basilica'],
+  palace: ['palace'],
+  monastery: ['monastery', 'abbey', 'priory'],
+  fortress: ['fortress', 'fort', 'citadel', 'stronghold'],
+  harbor: ['harbor', 'harbour', 'port', 'docks'],
+  'train station': ['train station', 'railway station', 'station'],
+  skyscraper: ['skyscraper', 'tower', 'high-rise'],
+  arena: ['arena', 'colosseum', 'coliseum', 'amphitheatre', 'amphitheater', 'stadium'],
+  university: ['university', 'college', 'campus'],
+  pyramid: ['pyramid'],
+  village: ['village', 'town', 'hamlet'],
+  'town square': ['square', 'plaza', 'piazza', 'town center'],
+  'city wall': ['city wall', 'walls', 'wall', 'rampart'],
+  dam: ['dam'],
+  conservatory: ['conservatory', 'greenhouse', 'glasshouse', 'orangery'],
+  theater: ['theater', 'theatre', 'opera'],
+  market: ['market', 'bazaar', 'marketplace'],
+  'town hall': ['town hall', 'city hall', 'guildhall'],
+  galleon: ['galleon', 'ship', 'frigate'],
+  street: ['street', 'alley', 'lane'],
+  aqueduct: ['aqueduct'],
+  ziggurat: ['ziggurat'],
+};
+
+const STYLE_WORDS = {
+  japanese: ['japanese', 'japan'],
+  chinese: ['chinese', 'china'],
+  korean: ['korean', 'korea', 'hanok'],
+  thai: ['thai', 'thailand'],
+  indian: ['indian', 'india', 'mughal'],
+  'ancient greek': ['greek', 'greece'],
+  roman: ['roman', 'rome'],
+  egyptian: ['egyptian', 'egypt'],
+  'russian wooden': ['russian', 'russia', 'wooden'],
+  'dark fantasy': ['dark', 'fantasy', 'gothic'],
+  'desert adobe': ['desert', 'adobe'],
+  'post apocalyptic': ['apocalyptic', 'abandoned', 'ruined'],
+  'nordic winter': ['nordic', 'winter', 'snow'],
+  'medieval knight': ['medieval', 'knight'],
+  'art nouveau': ['art nouveau'],
+  'art deco': ['art deco'],
+  'half-timbered': ['half-timbered', 'half timbered', 'timber'],
+};
+
+const wordsOf = (s) => (s || '').toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+
+export function themeWords(q) {
+  if (q.raw) {
+    const w = wordsOf(q.raw).filter((x) => x.length > 3);
+    return { object: w, style: [], mod: [] };
+  }
+  const object = q.object && q.object !== 'building'
+    ? OBJECT_WORDS[q.object] || [q.object.split(' ').pop()]
+    : [];
+  const style = q.style ? STYLE_WORDS[q.style] || wordsOf(q.style) : [];
+  const mod = q.mod ? wordsOf(q.mod) : [];
+  return { object, style, mod };
+}

@@ -407,7 +407,7 @@ async function loadRefs() {
     $('boardStatus').textContent = '';
     $('board').dataset.n = 1;
     $('board').innerHTML = `<div class="notice">
-      <p>Не удалось найти референсы для «${esc(s.theme.title)}». Источники не ответили или по этой теме пусто.</p>
+      <p>Не нашлось картинок, где точно есть «${esc(s.theme.object || s.theme.title)}». Источники не ответили или по этой теме пусто. Попробуй другую тему или открой Pinterest.</p>
       <div class="actions"><button class="btn" type="button" id="retry">Повторить поиск</button>
       <a class="btn" href="${esc(pinterestUrl(s.theme, s.source))}" target="_blank" rel="noopener">Открыть на Pinterest</a></div></div>`;
     $('retry').addEventListener('click', loadRefs);
@@ -424,7 +424,8 @@ function renderBoard() {
   $('board').innerHTML = s.shown.map((idx, pos) => tileHtml(s.pool[idx], pos)).join('');
   for (const img of $('board').querySelectorAll('img')) wireImg(img);
   const sources = [...new Set(s.shown.map((i) => s.pool[i].where.startsWith('r/') ? 'Reddit' : s.pool[i].where))];
-  $('boardStatus').textContent = `${s.shown.length} из ${s.pool.length} найденных · ${sources.join(', ')}`;
+  const few = s.pool.length < s.count ? ` · по теме нашлось только ${s.pool.length}` : ` из ${s.pool.length} по теме`;
+  $('boardStatus').textContent = `${s.shown.length}${few} · ${sources.join(', ')}`;
   const queries = [...new Set(s.shown.map((i) => s.pool[i].query))];
   $('boardQuery').textContent = DEMO ? 'Демо-картинки без поиска' : `Искали: ${queries.slice(0, 3).join(' · ')}`;
 }
